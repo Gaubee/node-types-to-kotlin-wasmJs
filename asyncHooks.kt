@@ -1,31 +1,94 @@
-@file:JsModule("async_hooks")
+@file:JsModule("node:async_hooks")
 
 package org.node.asyncHooks
 
-fun executionAsyncId(): Double
+external fun executionAsyncId(): Int /* number */
 
-fun executionAsyncResource(): JsAny
+external fun executionAsyncResource(): JsAny /* object */
 
-fun triggerAsyncId(): Double
+external fun triggerAsyncId(): Int /* number */
 
-external interface HookCallbacks {}
+external interface HookCallbacks {
+  val init:
+      ((
+          asyncId: Int /* number */,
+          type: String /* string */,
+          triggerAsyncId: Int /* number */,
+          resource: JsAny /* object */) -> Unit /* void */)?
 
-external interface AsyncHook {}
+  val before: ((asyncId: Int /* number */) -> Unit /* void */)?
 
-fun createHook(callbacks: JsAny)
+  val after: ((asyncId: Int /* number */) -> Unit /* void */)?
 
-external interface AsyncResourceOptions {
-  var triggerAsyncId: JsAny
+  val promiseResolve: ((asyncId: Int /* number */) -> Unit /* void */)?
 
-  var requireManualDestroy: JsAny
+  val destroy: ((asyncId: Int /* number */) -> Unit /* void */)?
 }
 
-external interface HookCallbacks {}
+external interface AsyncHook {
+  fun enable(): JsAny /* this */
 
-external interface AsyncHook {}
+  fun disable(): JsAny /* this */
+}
+
+external fun createHook(callbacks: HookCallbacks /* HookCallbacks */): AsyncHook /* AsyncHook */
 
 external interface AsyncResourceOptions {
-  var triggerAsyncId: JsAny
+  var triggerAsyncId: JsAny /* any */
 
-  var requireManualDestroy: JsAny
+  var requireManualDestroy: JsAny /* any */
+}
+
+external class AsyncResource(
+    type: String /* string */,
+    triggerAsyncId: JsAny /* number | AsyncResourceOptions */
+) {
+
+  companion object {
+    fun bind(
+        fn: JsAny /* Func */,
+        type: String /* string */,
+        thisArg: JsAny /* ThisArg */
+    ): JsAny /* Func */
+  }
+
+  fun bind(fn: JsAny /* Func */): JsAny /* Func */
+
+  fun runInAsyncScope(
+      fn: JsAny /* (this: This, ...args: any[]) => Result */,
+      thisArg: JsAny /* This */,
+      vararg args: JsAny
+  ): JsAny /* Result */
+
+  fun emitDestroy(): JsAny /* this */
+
+  fun asyncId(): Int /* number */
+
+  fun triggerAsyncId(): Int /* number */
+}
+
+external class AsyncLocalStorage() {
+
+  companion object {
+    fun bind(fn: JsAny /* Func */): JsAny /* Func */
+
+    fun snapshot():
+        JsAny /* <R, TArgs extends any[]>(fn: (...args: TArgs) => R, ...args: TArgs) => R */
+  }
+
+  fun disable(): Unit /* void */
+
+  fun getStore(): JsAny? /* T | undefined */
+
+  fun run(store: JsAny /* T */, callback: JsAny /* () => R */): JsAny /* R */
+
+  fun run(
+      store: JsAny /* T */,
+      callback: JsAny /* (...args: TArgs) => R */,
+      vararg args: JsAny
+  ): JsAny /* R */
+
+  fun exit(callback: JsAny /* (...args: TArgs) => R */, vararg args: JsAny): JsAny /* R */
+
+  fun enterWith(store: JsAny /* T */): Unit /* void */
 }
